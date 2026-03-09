@@ -1,25 +1,4 @@
 # %%
-import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-
-DB_USER = "postgres"
-DB_PASSWORD = "Badre2152@"
-DB_HOST = "localhost"
-DB_PORT = "5432"
-DB_NAME = "new_test1"
-
-DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-
-
-engine = create_engine(DATABASE_URL, echo=False)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-
-print("✅ Connexion à superstore_db établie avec succès !")
-
-# %%
 import urllib.parse
 from sqlalchemy import create_engine, text
 
@@ -370,5 +349,6 @@ with engine.connect() as conn:
         conn.execute(text(sql))
     conn.commit()
     print("⚡ Successfully optimized database performance using Indexes.")
+
 
 
