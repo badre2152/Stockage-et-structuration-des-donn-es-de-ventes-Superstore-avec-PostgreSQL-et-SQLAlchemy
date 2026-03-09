@@ -7,7 +7,7 @@ DB_USER = "postgres"
 DB_PASSWORD = "Badre2152@"
 DB_HOST = "localhost"
 DB_PORT = "5432"
-DB_NAME = "superstoreDB"
+DB_NAME = "new_test1"
 
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
@@ -27,7 +27,7 @@ DB_USER = "postgres"
 DB_PASS = "Badre2152@" 
 DB_HOST = "127.0.0.1"
 DB_PORT = "5432"
-DB_NAME = "superstoreDB"
+DB_NAME = "new_test1"
 
 encoded_pass = urllib.parse.quote_plus(DB_PASS)
 
@@ -51,7 +51,7 @@ DB_USER = "postgres"
 DB_PASS = "Badre2152@"
 DB_HOST = "127.0.0.1"
 DB_PORT = "5432"
-DB_NAME = "superstoreDB"
+DB_NAME = "new_test1"
 
 encoded_pass = urllib.parse.quote_plus(DB_PASS)
 DATABASE_URL = f"postgresql+psycopg://{DB_USER}:{encoded_pass}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
@@ -371,4 +371,4 @@ with engine.connect() as conn:
     conn.commit()
     print("⚡ Successfully optimized database performance using Indexes.")
 
-
+
