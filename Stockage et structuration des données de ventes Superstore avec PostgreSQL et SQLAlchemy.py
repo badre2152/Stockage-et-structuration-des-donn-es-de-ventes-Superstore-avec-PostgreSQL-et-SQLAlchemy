@@ -1,12 +1,15 @@
 # %%
 import urllib.parse
 from sqlalchemy import create_engine, text
+from dotenv import load_dotenv
+import os
+load_dotenv(dotenv_path='C:\\Users\\user\\Desktop\\superstore\\testdb\\data.env', override=True)
 
-DB_USER = "postgres"
-DB_PASS = "Badre2152@" 
-DB_HOST = "127.0.0.1"
-DB_PORT = "5432"
-DB_NAME = "new_test1"
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
 
 encoded_pass = urllib.parse.quote_plus(DB_PASS)
 
@@ -349,6 +352,7 @@ with engine.connect() as conn:
         conn.execute(text(sql))
     conn.commit()
     print("⚡ Successfully optimized database performance using Indexes.")
+
 
 
 
