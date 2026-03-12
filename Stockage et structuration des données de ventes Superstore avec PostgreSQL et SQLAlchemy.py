@@ -3,7 +3,7 @@ import urllib.parse
 from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 import os
-load_dotenv(dotenv_path='C:\\Users\\user\\Desktop\\superstore\\testdb\\data.env', override=True)
+load_dotenv(dotenv_path='\\data.env', override=True)
 
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
@@ -352,6 +352,7 @@ with engine.connect() as conn:
         conn.execute(text(sql))
     conn.commit()
     print("⚡ Successfully optimized database performance using Indexes.")
+
 
 
 
