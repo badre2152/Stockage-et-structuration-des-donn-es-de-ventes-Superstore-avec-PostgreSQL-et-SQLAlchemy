@@ -1,65 +1,49 @@
-# %%
-import urllib.parse
-from sqlalchemy import create_engine, text
-from dotenv import load_dotenv
 import os
-load_dotenv(dotenv_path='\\data.env', override=True)
+from pathlib import Path
 
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-DB_NAME = os.getenv("DB_NAME")
-
-encoded_pass = urllib.parse.quote_plus(DB_PASS)
-
-DATABASE_URL = f"postgresql+psycopg://{DB_USER}:{encoded_pass}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-
-try:
-    engine = create_engine(DATABASE_URL)
-    with engine.connect() as connection:
-        result = connection.execute(text("SELECT 'Connected successfully. Password verified.'"))
-        print(result.fetchone()[0])
-except Exception as e:
-    print("❌ Authentication error (Authentication Error)")
-    print(f"🔍 Details: {e}")
-
-# %%
-import urllib.parse
+from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
+from sqlalchemy.engine import URL
 from sqlalchemy.exc import SQLAlchemyError
 
-DB_USER = "postgres"
-DB_PASS = "Badre2152@"
-DB_HOST = "127.0.0.1"
-DB_PORT = "5432"
-DB_NAME = "new_test1"
+load_dotenv(Path(__file__).resolve().parent / ".env")
 
-encoded_pass = urllib.parse.quote_plus(DB_PASS)
-DATABASE_URL = f"postgresql+psycopg://{DB_USER}:{encoded_pass}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+required_keys = ("DB_USER", "DB_PASSWORD", "DB_HOST", "DB_PORT", "DB_NAME")
+missing_keys = [key for key in required_keys if not os.getenv(key)]
+if missing_keys:
+    raise ValueError("Missing database settings: " + ", ".join(missing_keys))
 
-engine = create_engine(DATABASE_URL)
+database_url = URL.create(
+    "postgresql+psycopg",
+    username=os.environ["DB_USER"],
+    password=os.environ["DB_PASSWORD"],
+    host=os.environ["DB_HOST"],
+    port=int(os.environ["DB_PORT"]),
+    database=os.environ["DB_NAME"],
+)
+engine = create_engine(database_url)
+
 
 def run_health_check():
-    print("🔍 System integrity check  ...")
+    print(" System integrity check  ...")
     try:
         with engine.connect() as conn:
             res = conn.execute(text("SELECT current_user, current_database(), version();"))
             user, db, ver = res.fetchone()
-            print(f"✅ Connection: Stable")
-            print(f"👤 User : {user}")
-            print(f"🗄️ base : {db}")
+            print(f" Connection: Stable")
+            print(f" User : {user}")
+            print(f" base : {db}")
 
             conn.execute(text("CREATE TEMP TABLE connection_test (id serial PRIMARY KEY, val text);"))
             conn.execute(text("INSERT INTO connection_test (val) VALUES ('test');"))
             conn.execute(text("DROP TABLE connection_test;"))
-            print("✅ Permissions: All necessary permissions are in place.")
+            print(" Permissions: All necessary permissions are in place.")
 
-            print("\n🚀 System is ready to proceed to the table creation stage !")
+            print("\n System is ready to proceed to the table creation stage !")
 
     except SQLAlchemyError as e:
-        print("\n❌ System integrity check failed")
-        print(f"⚠️ Technical reason: {e}")
+        print("\n System integrity check failed")
+        print(f" Technical reason: {e}")
 
 if __name__ == "__main__":
     run_health_check()
@@ -118,9 +102,9 @@ class OrderDetail(Base):
 # %%
 try:
     Base.metadata.create_all(engine)
-    print("🚀 All tables created successfully; all constraints and keys enforced ")
+    print(" All tables created successfully; all constraints and keys enforced ")
 except Exception as e:
-    print(f"❌ An error occurred while creating tables :  {e}")
+    print(f" An error occurred while creating tables :  {e}")
 
 # %%
 from sqlalchemy import event
@@ -133,9 +117,9 @@ def set_webapp_encoding(dbapi_connection, connection_record):
 
 try:
     Base.metadata.create_all(engine)
-    print("🚀 All tables created successfully!")
+    print(" All tables created successfully!")
 except Exception as e:
-    print(f"❌ Error: {e}")
+    print(f" Error: {e}")
 
 # %%
 import pandas as pd
@@ -170,25 +154,25 @@ try:
     for _, r in geo_data.iterrows():
         session.merge(Geography(postal_code=r['Postal Code'], city=r['City'], 
                                 state=r['State'], country=r['Country'], region=r['Region']))
-    print("✅ Geography loaded ")
+    print(" Geography loaded ")
 
     prod_data = df[['Product ID', 'Product Name', 'Category', 'Sub-Category']].drop_duplicates('Product ID')
     for _, r in prod_data.iterrows():
         session.merge(Product(product_id=r['Product ID'], product_name=r['Product Name'], 
                               category=r['Category'], sub_category=r['Sub-Category']))
-    print("✅ Products loaded successfully.")
+    print(" Products loaded successfully.")
 
     cust_data = df[['Customer ID', 'Customer Name', 'Segment', 'Postal Code']].drop_duplicates('Customer ID')
     for _, r in cust_data.iterrows():
         session.merge(Customer(customer_id=r['Customer ID'], customer_name=r['Customer Name'], 
                                segment=r['Segment'], postal_code=r['Postal Code']))
-    print("✅ Customers loaded successfully.")
+    print(" Customers loaded successfully.")
 
     order_data = df[['Order ID', 'Order Date', 'Ship Date', 'Ship Mode', 'Customer ID']].drop_duplicates('Order ID')
     for _, r in order_data.iterrows():
         session.merge(Order(order_id=r['Order ID'], order_date=r['Order Date'], 
                             ship_date=r['Ship Date'], ship_mode=r['Ship Mode'], customer_id=r['Customer ID']))
-    print("✅ Orders loaded successfully.")
+    print(" Orders loaded successfully.")
 
     for _, r in df.iterrows():
         session.add(OrderDetail(
@@ -202,11 +186,11 @@ try:
         ))
     
     session.commit()
-    print("✨ All data has been loaded successfully! ")
+    print(" All data has been loaded successfully! ")
 
 except Exception as e:
     session.rollback()
-    print(f"❌ Failed to load data: {e}")
+    print(f" Failed to load data: {e}")
 finally:
     session.close()
 
@@ -221,7 +205,7 @@ with engine.connect() as conn:
         GROUP BY g.region;
     """)
     result = conn.execute(query)
-    print("\n📊 Relationship Validation:(Sales by Region ): ")
+    print("\n Relationship Validation:(Sales by Region ): ")
     for row in result:
         print(f"Region: {row[0]} | Total Sales: ${row[1]:,.2f}")
 
@@ -236,13 +220,13 @@ with engine.connect() as conn:
     result = conn.execute(text("SELECT SUM(sales) FROM order_details"))
     total_sales_db = result.fetchone()[0]
 
-print(f"💰 Total Sales (CSV): {total_sales_csv:,.2f}")
-print(f"💰 Total Sales (DB):  {total_sales_db:,.2f}")
+print(f" Total Sales (CSV): {total_sales_csv:,.2f}")
+print(f" Total Sales (DB):  {total_sales_db:,.2f}")
 
 if round(total_sales_csv, 2) == round(total_sales_db, 2):
-    print("✅ Full Match: Financial data is intact!b")
+    print(" Full Match: Financial data is intact!b")
 else:
-    print("❌ Error: Figures mismatch, check the upload/loading process.")
+    print(" Error: Figures mismatch, check the upload/loading process.")
 
 # %%
 query_join = text("""
@@ -257,7 +241,7 @@ query_join = text("""
 
 with engine.connect() as conn:
     result = conn.execute(query_join)
-    print("\n📊 Regional Analysis Report(Multi-Join):")
+    print("\n Regional Analysis Report(Multi-Join):")
     for row in result:
         print(f"Region: {row[0]:<10} | Orders: {row[1]:<5} | Sales: ${row[2]:,.2f}")
 
@@ -270,7 +254,7 @@ try:
         """))
         conn.commit()
 except Exception as e:
-    print("\n🛡️ Referential Integrity Test: Success!")
+    print("\n Referential Integrity Test: Success!")
     print(f"Result: Insertion was properly blocked (Expected Foreign Key Constraint Error)")
 
 # %%
@@ -285,7 +269,7 @@ query_top_products = text("""
 
 with engine.connect() as conn:
     result = conn.execute(query_top_products)
-    print("\n🏆 Most Profitable Products List:")
+    print("\n Most Profitable Products List:")
     for row in result:
         print(f"- {row[0][:40]:<45} | Profit: ${row[1]:,.2f}")
 
@@ -319,7 +303,7 @@ JOIN products p ON od.product_id = p.product_id;
 with engine.connect() as conn:
     conn.execute(create_master_view)
     conn.commit()
-    print("✅ Successfully created View_Master_Sales!")
+    print(" Successfully created View_Master_Sales!")
 
 # %%
 create_kpi_view = text("""
@@ -338,7 +322,7 @@ GROUP BY category, region;
 with engine.connect() as conn:
     conn.execute(create_kpi_view)
     conn.commit()
-    print("✅ View_KPI_Summary has been created successfully.")
+    print(" View_KPI_Summary has been created successfully.")
 
 # %%
 indexes_script = [
@@ -351,7 +335,7 @@ with engine.connect() as conn:
     for sql in indexes_script:
         conn.execute(text(sql))
     conn.commit()
-    print("⚡ Successfully optimized database performance using Indexes.")
+    print(" Successfully optimized database performance using Indexes.")
 
 
 
